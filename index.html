@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hibiki Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an editing timeline. Two equal tracks, V1 = development, V2 = video editing, share one page. */
+:root{
+  --bg:#ffffff;
+  --fg:#0b0b0b;
+  --muted:#6b6b6b;
+  --line:#d9d9d9;
+  --soft:#f2f2f2;
+  --invert-bg:#0b0b0b;
+  --invert-fg:#ffffff;
+  --display:"Syne","Zen Kaku Gothic New",system-ui,sans-serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --gutter:clamp(16px,4vw,48px);
+  --lab:64px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0a0a0a;--fg:#f4f4f4;--muted:#8f8f8f;--line:#2a2a2a;--soft:#151515;--invert-bg:#f4f4f4;--invert-fg:#0a0a0a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0a0a0a;--fg:#f4f4f4;--muted:#8f8f8f;--line:#2a2a2a;--soft:#151515;--invert-bg:#f4f4f4;--invert-fg:#0a0a0a;color-scheme:dark}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.8;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+a:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:var(--gutter)}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+
+/* top bar */
+.bar{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:22px;border-bottom:1px solid var(--line)}
+.bar .role{white-space:nowrap}
+.bar .name{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:.02em}
+.tc{font-variant-numeric:tabular-nums}
+
+/* hero */
+.hero{padding-block:clamp(48px,9vw,112px) clamp(36px,6vw,72px)}
+.hero .eyebrow{display:block;margin-bottom:clamp(12px,2vw,20px);color:var(--muted)}
+.hero h1{font-family:var(--display);font-weight:800;line-height:.88;letter-spacing:-.04em;font-size:clamp(56px,17vw,208px);margin:0}
+.lede{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,56px);margin-top:clamp(28px,5vw,56px);border-top:1px solid var(--fg);padding-top:20px}
+.lede p{margin:0;max-width:34em;font-size:16px}
+.lede .jp{font-size:clamp(20px,2.4vw,28px);font-weight:700;line-height:1.5;text-wrap:balance}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-block:1px solid var(--line)}
+.stat{padding:22px 20px;border-left:1px solid var(--line);min-width:0}
+.stat:first-child{border-left:0;padding-left:0}
+.stat b{display:block;font-family:var(--display);font-weight:800;font-size:clamp(30px,3.9vw,48px);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stat b{white-space:nowrap}
+.stat b small{font-family:var(--body);font-weight:700;font-size:.42em;letter-spacing:0;margin-left:.08em}
+.stat span{display:block;margin-top:10px;color:var(--muted);font-size:13px}
+
+/* timeline */
+.timeline{margin-block:clamp(56px,8vw,96px)}
+.tl-head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.tl{position:relative;border:1px solid var(--fg);overflow-x:auto}
+.tl-inner{min-width:640px;position:relative}
+.track{display:grid;grid-template-columns:var(--lab) 1fr;border-bottom:1px solid var(--line)}
+.track:last-child{border-bottom:0}
+.track .lab{font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;border-right:1px solid var(--line);background:var(--soft);letter-spacing:.08em}
+.ruler .cells,.bars,.clips{display:grid;grid-template-columns:repeat(16,minmax(0,1fr))}
+.ruler .cells div{overflow:hidden;white-space:nowrap;font-family:var(--mono);font-size:10px;color:var(--muted);padding:6px 0 6px 6px;border-left:1px solid var(--line);font-variant-numeric:tabular-nums}
+.bars{height:120px;align-items:end}
+.bars div{position:relative;margin:0 3px;background:var(--fg);min-height:1px}
+.bars div[data-n]::before{content:attr(data-n);position:absolute;bottom:100%;left:0;right:0;text-align:center;font-family:var(--mono);font-size:10px;color:var(--muted);padding-bottom:3px}
+.clips{height:48px;align-items:center}
+.clip{height:30px;margin:0 2px;border:1px solid var(--fg);font-family:var(--mono);font-size:10px;line-height:28px;padding-inline:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.06em}
+.clip.fill{background:var(--fg);color:var(--bg)}
+.playhead{position:absolute;top:0;bottom:0;left:var(--lab);width:1px;background:var(--fg);pointer-events:none;animation:sweep 3.2s cubic-bezier(.6,0,.2,1) .3s both}
+.playhead::before{content:"";position:absolute;top:0;left:-5px;border:5px solid transparent;border-top:7px solid var(--fg)}
+@keyframes sweep{from{left:var(--lab)}to{left:calc(100% - 1px)}}
+.tl-note{margin-top:10px;color:var(--muted);font-size:12px}
+
+/* two tracks */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-top:1px solid var(--fg)}
+.col{padding-block:36px 56px;min-width:0}
+.col:first-child{padding-right:clamp(20px,3.5vw,48px);border-right:1px solid var(--line)}
+.col:last-child{padding-left:clamp(20px,3.5vw,48px)}
+.col-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.col h2{font-family:var(--display);font-weight:800;font-size:clamp(30px,3.1vw,45px);line-height:.95;letter-spacing:-.03em;margin:14px 0 6px}
+.col .sub{color:var(--muted);margin:0 0 28px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:32px}
+.chip{font-family:var(--mono);font-size:11px;border:1px solid var(--fg);padding:3px 9px;letter-spacing:.04em}
+.chip.solid{background:var(--fg);color:var(--bg)}
+.h3{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:8px;margin:0 0 4px}
+.list{list-style:none;margin:0 0 36px;padding:0}
+.item{display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding-block:16px;border-bottom:1px solid var(--line)}
+.item h4{margin:0;font-size:16px;font-weight:700;line-height:1.5}
+.item h4 a{text-decoration:none;border-bottom:1px solid var(--fg)}
+.item h4 a:hover{background:var(--fg);color:var(--bg)}
+.item p{grid-column:1/-1;margin:0;color:var(--muted);font-size:14px;line-height:1.75}
+.item .meta{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap;padding-top:4px;font-variant-numeric:tabular-nums}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:36px}
+.tool{border:1px solid var(--fg);padding:16px;display:flex;gap:14px;align-items:center;min-width:0}
+.tool .glyph{flex:none;width:44px;height:44px;display:grid;place-items:center;background:var(--fg);color:var(--bg);font-family:var(--display);font-weight:800;font-size:18px}
+.tool b{display:block;font-size:14px}
+.tool span{display:block;font-size:12px;color:var(--muted);line-height:1.5}
+.ratio{display:inline-flex;align-items:center;gap:8px}
+.ratio i{display:inline-block;border:1px solid var(--muted)}
+.r169{width:22px;height:12.4px}
+.r916{width:9px;height:16px}
+.steps{list-style:none;margin:0 0 36px;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-left:1px solid var(--line)}
+.steps li{padding:12px 12px 14px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);font-size:13px;line-height:1.5;min-width:0}
+.steps li:nth-child(-n+3){border-top:1px solid var(--line)}
+.steps li span{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:4px;letter-spacing:.08em}
+.record{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-left:1px solid var(--line);border-top:1px solid var(--line);margin:0 0 36px}
+.record div{padding:14px 14px 16px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:0}
+.record dt{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.record dd{margin:4px 0 0;font-family:var(--display);font-weight:800;font-size:clamp(22px,2.2vw,28px);line-height:1.15;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.record dd small{font-family:var(--body);font-weight:700;font-size:.55em;letter-spacing:0}
+.record p{margin:6px 0 0;font-size:12px;color:var(--muted);line-height:1.5}
+.nda{border:1px solid var(--fg);padding:16px 18px;font-size:13px;line-height:1.75}
+.nda b{font-family:var(--mono);font-size:11px;letter-spacing:.14em;display:block;margin-bottom:4px}
+
+/* contact */
+.contact{background:var(--invert-bg);color:var(--invert-fg);margin-top:0}
+.contact .inner{padding-block:clamp(48px,8vw,96px) clamp(32px,5vw,56px);display:grid;grid-template-columns:1fr 2fr;gap:24px clamp(24px,5vw,72px)}
+.contact .lead{margin:0;opacity:.7;font-size:14px;max-width:22em}
+.contact .lead .mono{display:block;opacity:1;margin-bottom:12px}
+.links{list-style:none;margin:0;padding:0;border-top:1px solid var(--invert-fg);min-width:0}
+.links li{display:grid;grid-template-columns:120px 1fr auto;align-items:center;gap:8px 16px;padding-block:18px;border-bottom:1px solid color-mix(in srgb,var(--invert-fg) 30%,transparent)}
+.links .k{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.6}
+.links .v{font-size:clamp(17px,2.2vw,24px);font-weight:500;text-decoration:none;min-width:0;overflow-wrap:anywhere}
+.links a.v:hover{text-decoration:underline;text-underline-offset:4px}
+.links a:focus-visible,.copy:focus-visible{outline:2px solid var(--invert-fg);outline-offset:3px}
+.copy{font-family:var(--mono);font-size:11px;letter-spacing:.1em;background:transparent;color:inherit;border:1px solid var(--invert-fg);padding:6px 10px;cursor:pointer;transition:background .2s,color .2s}
+.copy:hover{background:var(--invert-fg);color:var(--invert-bg)}
+.arrow{font-family:var(--mono);font-size:14px;opacity:.6}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:18px;opacity:.6}
+
+@media (max-width:820px){
+  .lede,.split,.contact .inner{grid-template-columns:minmax(0,1fr)}
+  .bar .role{display:none}
+  .col:first-child{padding-right:0;border-right:0;border-bottom:1px solid var(--fg)}
+  .col:last-child{padding-left:0}
+  .col h2{font-size:min(8.4vw,56px)}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat:nth-child(3){border-left:0;padding-left:0}
+  .stat:nth-child(-n+2){border-bottom:1px solid var(--line)}
+}
+@media (max-width:600px){
+  :root{--lab:40px}
+  body{font-size:14px}
+  .tl-inner{min-width:0}
+  .ruler .cells div{font-size:9px;padding-left:3px;letter-spacing:-.02em}
+  .ruler .cells div:nth-child(even){color:transparent}
+  .bars{height:96px}
+  .bars div{margin:0 2px}
+  .bars div[data-n]::before{font-size:9px}
+  .clip{font-size:9px;padding-inline:4px;letter-spacing:0}
+  .track .lab{font-size:10px}
+  .links li{grid-template-columns:1fr auto;padding-block:14px}
+  .links .k{grid-column:1/-1}
+  .col{padding-block:28px 44px}
+  .lede p{font-size:15px}
+}
+@media (max-width:460px){
+  .stat b{font-size:clamp(22px,7vw,32px)}
+  .record dd{font-size:clamp(18px,5.6vw,22px)}
+  .record div{padding:12px 10px 14px}
+  .tools{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .steps li:nth-child(3){border-top:0}
+}
+@media (prefers-reduced-motion:reduce){.playhead{animation:none;left:calc(100% - 1px)}}
+</style>
+</head>
+<body>
+
+<header class="wrap bar">
+  <span class="name">HIBIKI</span>
+  <span class="mono role">Developer &amp; Video Editor</span>
+  <span class="mono tc" id="tc">00:00:00:00</span>
+</header>
+
+<main>
+  <section class="wrap hero">
+    <span class="mono eyebrow">Portfolio — Developer / Video Editor</span>
+    <h1>Hibiki</h1>
+    <div class="lede">
+      <p class="jp">業務ツールの開発と、<br>動画編集をしています。</p>
+      <p>業務ツールやBOTの開発と、YouTube・VTuber・Instagramリールの動画編集をしています。開発ではSNS分析ダッシュボードやSlackの自動化BOTを作り、本番環境で運用まで担当しています。編集は2024年5月から月5本ペースで続けていて、コンセプト設計から担当したチャンネルを登録者0人から5万人まで伸ばしました。Premiere ProとPhotoshopで、カットからテロップ、サムネイルまで一通り対応します。</p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="stats">
+      <div class="stat"><b>174</b><span>GitHub コミット（Hibiki6821）</span></div>
+      <div class="stat"><b>17</b><span>コミットしたリポジトリ</span></div>
+      <div class="stat"><b>5万<small>人</small></b><span>登録者 0 から伸ばしたチャンネル</span></div>
+      <div class="stat"><b>250万<small>回</small></b><span>YouTube 最高再生数</span></div>
+    </div>
+  </section>
+
+  <section class="wrap timeline" aria-label="活動タイムライン">
+    <div class="tl-head">
+      <span class="mono">Sequence 01 — Activity</span>
+      <span class="mono tc">2025.06 → 2026.09</span>
+    </div>
+    <div class="tl">
+      <div class="tl-inner">
+        <div class="track ruler"><div class="lab">TC</div><div class="cells" id="ruler"></div></div>
+        <div class="track"><div class="lab">V2</div><div class="clips">
+          <div class="clip" style="grid-column:1/17">EDIT — YouTube / VTuber / Instagram Reels（2024.05〜 継続）</div>
+        </div></div>
+        <div class="track"><div class="lab">V1</div><div class="clips">
+          <div class="clip" style="grid-column:1/4">img-line-conv</div>
+          <div class="clip" style="grid-column:5/6">csv</div>
+          <div class="clip" style="grid-column:9/11">2.5D VTuber Maker</div>
+          <div class="clip fill" style="grid-column:13/17">業務ツール / BOT 開発</div>
+        </div></div>
+        <div class="track"><div class="lab">A1</div><div class="bars" id="bars" aria-label="月別コミット数"></div></div>
+        <div class="playhead" aria-hidden="true"></div>
+      </div>
+    </div>
+    <p class="tl-note">A1 はHibiki6821名義の月別コミット数です。非公開の業務リポジトリへのコミットも含みます。</p>
+  </section>
+
+  <section class="wrap split">
+    <!-- V1: development -->
+    <div class="col">
+      <div class="col-head"><span class="mono">V1 · Development</span><span class="mono tc">132 commits / 2025.06–</span></div>
+      <h2>Development</h2>
+      <p class="sub">SNS分析、Slack自動化、社内ツールの開発と運用</p>
+      <div class="chips">
+        <span class="chip solid">TypeScript</span><span class="chip solid">Python</span><span class="chip solid">JavaScript</span>
+        <span class="chip">HTML / CSS</span><span class="chip">Slack API</span><span class="chip">Meta Graph API</span><span class="chip">Firebase</span><span class="chip">Linux / systemd</span>
+      </div>
+
+      <h3 class="h3">実績</h3>
+      <dl class="record">
+        <div><dt>開発歴</dt><dd>7<small>年</small></dd><p>15歳から開発を続けている（現在22歳）</p></div>
+        <div><dt>コミット</dt><dd>174</dd><p>Hibiki6821 名義の合計</p></div>
+        <div><dt>リポジトリ</dt><dd>17</dd><p>コミットした個人・業務リポジトリ</p></div>
+        <div><dt>主な言語</dt><dd>3</dd><p>TypeScript、Python、JavaScript</p></div>
+        <div><dt>最多プロジェクト</dt><dd>47<small>コミット</small></dd><p>Instagram 分析ダッシュボード</p></div>
+        <div><dt>最多の月</dt><dd>44<small>コミット</small></dd><p>2026年8月</p></div>
+      </dl>
+
+      <h3 class="h3">業務での開発</h3>
+      <ul class="list">
+        <li class="item"><h4>Instagram 分析ダッシュボード</h4><span class="meta">TS · 47 commits</span>
+          <p>複数アカウントのインサイトを定期取得し、投稿ごとの伸びをグラフで確認できる社内向けWebアプリ。</p></li>
+        <li class="item"><h4>リール自動保存 BOT</h4><span class="meta">Python · Slack</span>
+          <p>Slackに貼られたInstagram・TikTok・YouTubeのURLを動画ファイルにしてスレッドへ投稿し、再生数などの数字を添える。</p></li>
+        <li class="item"><h4>プラン人数の自動調整</h4><span class="meta">Python · systemd</span>
+          <p>会員プランの残り枠を10分ごとに確認して自動で調整する常駐ジョブ。</p></li>
+        <li class="item"><h4>2.5D VTuber Maker</h4><span class="meta">32 commits</span>
+          <p>写真にLive2Dモデルを重ねて2.5D風の画像を作るWebアプリ。MediaPipeの顔検出で自動配置し、ZIPで一括処理できる。</p></li>
+        <li class="item"><h4>img-line-conv</h4><span class="meta">18 commits</span>
+          <p>Xで見かける「長押しで拡大してね」系の画像をブラウザだけで作れるツール。</p></li>
+      </ul>
+
+      <h3 class="h3">個人開発（公開）</h3>
+      <ul class="list">
+        <li class="item"><h4><a href="https://hibiki6821.github.io/pckstudio-web/" target="_blank" rel="noopener">PCK Studio Web</a></h4><span class="meta">JS</span>
+          <p>Minecraft Legacy Console Edition の .pck ファイルをブラウザで閲覧・編集する。</p></li>
+      </ul>
+    </div>
+
+    <!-- V2: editing -->
+    <div class="col">
+      <div class="col-head"><span class="mono">V2 · Video Editing</span><span class="mono tc">2024.05–</span></div>
+      <h2>Video Editing</h2>
+      <p class="sub">YouTube、VTuber、Instagramリールの編集が中心</p>
+      <div class="chips">
+        <span class="chip solid">カット編集</span><span class="chip solid">テロップ</span><span class="chip solid">サムネイル</span>
+        <span class="chip">BGM / SE</span><span class="chip">テンポ調整</span><span class="chip">縦型リサイズ</span><span class="chip">書き出し</span>
+      </div>
+
+      <div class="tools">
+        <div class="tool"><span class="glyph">Pr</span><div><b>Adobe Premiere Pro</b><span>カット、テロップ、音、書き出し</span></div></div>
+        <div class="tool"><span class="glyph">Ps</span><div><b>Adobe Photoshop</b><span>サムネイル、素材の切り抜き</span></div></div>
+      </div>
+
+      <h3 class="h3">実績</h3>
+      <dl class="record">
+        <div><dt>編集歴</dt><dd>2<small>年</small>4<small>か月</small></dd><p>2024年5月から業務として継続中</p></div>
+        <div><dt>本数</dt><dd>月5<small>本</small></dd><p>開始から同じペースで累計140本以上</p></div>
+        <div><dt>チャンネル育成</dt><dd>0→5万<small>人</small></dd><p>コンセプト設計から担当して登録者を伸ばした</p></div>
+        <div><dt>YouTube 最高</dt><dd>250万<small>回</small></dd><p>担当した動画の最高再生数</p></div>
+        <div><dt>リール平均</dt><dd>8〜20万<small>回</small></dd><p>Instagramリールの平均再生数</p></div>
+        <div><dt>リール最高</dt><dd>220万<small>回</small></dd><p>担当したリールの最高再生数</p></div>
+      </dl>
+
+      <h3 class="h3">担当ジャンル</h3>
+      <ul class="list">
+        <li class="item"><h4>YouTube</h4><span class="meta ratio"><i class="r169"></i>16:9</span>
+          <p>撮影素材から不要な間を詰めて見やすいテンポに整え、テロップと効果音で要点を伝える。サムネイルも制作。</p></li>
+        <li class="item"><h4>VTuber</h4><span class="meta ratio"><i class="r169"></i>16:9</span>
+          <p>配信や収録の素材を動画用に再構成する。立ち絵やキャラクターの見せ方に合わせてテロップと演出を付ける。</p></li>
+        <li class="item"><h4>Instagram リール</h4><span class="meta ratio"><i class="r916"></i>9:16</span>
+          <p>冒頭の数秒で止まってもらう構成を意識した縦型ショート。テンポの速いカットと読みやすいテロップ。</p></li>
+      </ul>
+
+      <h3 class="h3">編集の流れ</h3>
+      <ol class="steps">
+        <li><span>01</span>素材受け取り・構成確認</li>
+        <li><span>02</span>カット・テンポ調整</li>
+        <li><span>03</span>テロップ・演出</li>
+        <li><span>04</span>BGM・SE・音量調整</li>
+        <li><span>05</span>サムネイル制作</li>
+        <li><span>06</span>書き出し・納品</li>
+      </ol>
+
+      <div class="nda"><b>NDA</b>編集した作品はクライアントとの秘密保持契約により公開していません。ご相談いただいた際に、お話しできる範囲で内容をお伝えします。</div>
+    </div>
+  </section>
+</main>
+
+<footer class="contact">
+  <div class="wrap inner">
+    <p class="lead"><span class="mono">Contact</span>開発と動画編集、どちらのご相談も受け付けています。</p>
+    <ul class="links">
+      <li><span class="k">Instagram</span><a class="v" href="https://www.instagram.com/_.hbk_sk/" target="_blank" rel="noopener">@_.hbk_sk</a><span class="arrow" aria-hidden="true">↗</span></li>
+      <li><span class="k">Gmail</span><a class="v" id="mail" href="mailto:sakabehibiki@gmail.com">sakabehibiki@gmail.com</a><button class="copy" id="copy" type="button">COPY</button></li>
+      <li><span class="k">GitHub</span><a class="v" href="https://github.com/Hibiki6821" target="_blank" rel="noopener">Hibiki6821</a><span class="arrow" aria-hidden="true">↗</span></li>
+    </ul>
+  </div>
+  <div class="wrap foot mono"><span>© 2026 Hibiki</span><span>Developer / Video Editor</span></div>
+</footer>
+
+<script>
+(function(){
+  var months=["25.06","25.07","25.08","25.09","25.10","25.11","25.12","26.01","26.02","26.03","26.04","26.05","26.06","26.07","26.08","26.09"];
+  var counts=[13,1,5,0,4,0,0,2,26,7,4,0,2,21,44,3];
+  var max=Math.max.apply(null,counts);
+  var ruler=document.getElementById("ruler"),bars=document.getElementById("bars");
+  months.forEach(function(m,i){
+    var c=document.createElement("div");c.textContent=m;ruler.appendChild(c);
+    var b=document.createElement("div");
+    b.style.height=counts[i]?(counts[i]/max*96)+"px":"1px";
+    if(counts[i])b.setAttribute("data-n",counts[i]);
+    b.title=m+" : "+counts[i]+" commits";
+    bars.appendChild(b);
+  });
+  var copy=document.getElementById("copy");
+  copy.addEventListener("click",function(){
+    var addr="sakabehibiki@gmail.com";
+    function done(){copy.textContent="COPIED";setTimeout(function(){copy.textContent="COPY"},1600)}
+    function fallback(){var r=document.createRange();r.selectNodeContents(document.getElementById("mail"));var sel=getSelection();sel.removeAllRanges();sel.addRange(r)}
+    try{navigator.clipboard.writeText(addr).then(done,fallback)}catch(e){fallback()}
+  });
+  // running timecode at 30fps
+  var tc=document.getElementById("tc"),t0=performance.now();
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  function pad(n){return(n<10?"0":"")+n}
+  function tick(now){
+    var f=Math.floor((now-t0)/1000*30),fr=f%30,s=Math.floor(f/30)%60,m=Math.floor(f/1800)%60,h=Math.floor(f/108000);
+    tc.textContent=pad(h)+":"+pad(m)+":"+pad(s)+":"+pad(fr);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
